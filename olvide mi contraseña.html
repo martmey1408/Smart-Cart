@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container .description {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 14px;
+            color: #666;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-style: italic;
+        }
+    </style>
+    <script>
+        async function sendEmail(email) {
+            try {
+                const response = await fetch('http://localhost:8080/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al enviar el correo');
+                }
+
+                const result = await response.text();
+                console.log(result);
+                alert('Se ha enviado un correo con instrucciones para recuperar tu contraseña.');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un problema al enviar el correo. Por favor, inténtalo de nuevo.');
+            }
+        }
+
+        function redirectToNewPassword() {
+            const email = document.getElementById('user-input').value;
+            sendEmail(email);
+            window.localStorage.setItem('recovery-email', email);
+            window.location.href = "nueva contraseña.html"; 
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo">     
+        <h2><strong><em>Recupera tu contraseña</em></strong></h2>
+        <p class="description"><strong><em>Enviaremos un mail a su correo con el fin de recuperar el acceso a su cuenta</em></strong></p>
+        <form onsubmit="event.preventDefault(); redirectToNewPassword();">
+            <label for="user-input"><strong><em>Ingrese su correo electrónico:</em></strong></label>
+            <input type="text" id="user-input" placeholder="Correo electrónico" required>
+            <button type="submit"><strong><em>Siguiente</em></strong></button>
+        </form>
+    </div>
+</body>
+</html>

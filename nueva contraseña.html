@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Nueva Contraseña</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-style: italic;
+            text-align: left;
+        }
+        .login-container button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo">     
+        <h2><strong><em>Crear Nueva Contraseña</em></strong></h2>
+        <form id="password-form">
+            <label for="new-password"><strong><em>Ingrese su nueva contraseña:</em></strong></label>
+            <input type="password" id="new-password" name="new-password" required>
+            <label for="confirm-password"><strong><em>Confirmar nueva contraseña:</em></strong></label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+            <button type="submit"><strong><em>Siguiente</em></strong></button>
+            <p id="error-message" class="error"></p>
+        </form>
+    </div>
+    <script>
+        document.getElementById('password-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            var newPassword = document.getElementById('new-password').value;
+            var confirmPassword = document.getElementById('confirm-password').value;
+            var currentPassword = window.localStorage.getItem('current-password');
+            var username = window.localStorage.getItem('username');
+            var errorMessage = document.getElementById('error-message');
+
+            console.log('Current Password:', currentPassword);
+            console.log('Username:', username);
+
+            errorMessage.textContent = '';
+
+            // Validación de que las contraseñas coincidan
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = 'Las contraseñas no coinciden.';
+                return;
+            }
+
+            // Validación de que la nueva contraseña sea diferente a la actual
+            if (newPassword === currentPassword) {
+                errorMessage.textContent = 'La nueva contraseña no puede ser igual a la contraseña actual.';
+                return;
+            }
+
+            // Validación de longitud mínima de 9 caracteres
+            if (newPassword.length < 9) {
+                errorMessage.textContent = 'La nueva contraseña debe tener al menos 9 caracteres.';
+                return;
+            }
+
+            // Validación de caracteres especiales
+            var specialCharacters = /[!@#$%^&*(),.?":{}|<>]/;
+            if (!specialCharacters.test(newPassword)) {
+                errorMessage.textContent = 'La nueva contraseña debe contener al menos un carácter especial.';
+                return;
+            }
+
+            if (!username) {
+                errorMessage.textContent = 'No se encontró el nombre de usuario. Por favor, intenta nuevamente.';
+                return;
+            }
+
+            fetch('http://localhost:8080/update-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    newPassword: newPassword
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response Data:', data);
+                if (data.success) {
+                    alert('Contraseña actualizada exitosamente.');
+                    window.location.href = `inicio de sesion.html?username=${encodeURIComponent(username)}&password=${encodeURIComponent(newPassword)}`;
+                } else {
+                    errorMessage.textContent = 'Hubo un error al actualizar la contraseña.';
+                }
+            })
+            .catch(error => {
+                errorMessage.textContent = 'Hubo un error al actualizar la contraseña.';
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
+
+

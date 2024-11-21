@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Alertas - Smart Cart</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FF3232;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .navbar-left, .navbar-center, .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .menu-icon img {
+            width: 30px;
+        }
+    
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            width: 200px;
+            position: absolute;
+            top: 80px; /* Ajustado para que esté más abajo */
+            left: 0;  /* Alineación horizontal */
+            display: none;
+            z-index: 100; /* Asegura que el menú aparezca por encima de otros elementos */
+        }
+
+        .menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease; /* Transición suave para el efecto hover */
+        }
+
+        .menu li:last-child {
+            border-bottom: none;
+        }
+
+        .menu li:hover {
+            background-color: #e0e0e0; /* Color de fondo cuando pasas el mouse sobre una opción */
+        }
+
+        .menu li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+
+        .logo {
+            height: 70px;
+        }
+        .username {
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: small;
+        }
+        .user-icon {
+            width: 20px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .user-section {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .user-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .supermarket-section, .product-section {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .supermarket-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .supermarket-item, .product-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: calc(33.33% - 20px);
+        }
+
+        .supermarket-item {
+            width: calc(33.33% - 20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 250px;
+        }
+
+        .supermarket-item img, .product-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .supermarket-item h3 {
+            margin: 10px 0;
+        }
+
+        .alert-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-top: auto;
+        }
+
+        .alert-button img {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <button class="menu-icon" onclick="toggleMenu()">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/png-transparent-hamburger-button-computer-icons-marmon-keystone-canada-menu-red-sea-thumbnail.jpg" alt="Menu Icon">
+            </button>
+            <ul id="menu-list" class="menu hidden">
+                <li><a href="recetas.html">Ver todas las recetas</a></li>
+                <li><a href="productos prioritarios.html">Ver los productos prioritarios</a></li>
+                <li><a href="configurar alertas.html">Configurar alertas</a></li>
+                <li><a href="tendencia de gastos.html">Tendencias de Gastos</a></li>
+            </ul>
+        </div>
+        <div class="navbar-center">
+            <a href="home.html"><img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="Smart Cart Logo" class="logo">
+            </a>
+            
+        </div>
+        <div class="navbar-right">
+            <div class="user-section" onclick="toggleUserMenu(event)">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(2).png" alt="User Icon" class="user-icon">
+                <span class="username" id="username-display"></span>
+            </div>
+            <div id="user-menu" class="user-menu">
+                <button onclick="manageProfile()">Gestión de perfil</button>
+                <button onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Configurar alertas</h1>
+
+        <div class="supermarket-section">
+            <h2>Configurar alertas sobre supermercados</h2>
+            <div class="supermarket-grid" id="supermarket-grid">
+               <!--Productos serán agregados dinámicamente aquí -->
+            </div>
+        </div>
+
+        <div class="product-section">
+            <h2>Alertas sobre productos</h2>
+            <div class="product-grid" id="product-grid">
+                <!--Productos serán agregados dinámicamente aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menuList = document.getElementById('menu-list');
+            menuList.classList.toggle('show');
+        } 
+        function toggleUserMenu(event) {
+            const userMenu = document.getElementById('user-menu');
+
+            if (userMenu.style.display === 'block') {
+                userMenu.style.display = 'none';
+            } else {
+                userMenu.style.display = 'block';
+            }
+
+            event.stopPropagation();
+        }
+
+        document.addEventListener('click', function() {
+            const userMenu = document.getElementById('user-menu');
+            userMenu.style.display = 'none';
+        });
+
+        document.getElementById('user-menu').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        function manageProfile() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+        function logout() {
+            localStorage.removeItem('username');
+            window.location.href = 'inicio de sesion.html';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-section') && !event.target.closest('.user-menu')) {
+                const userMenu = document.getElementById('user-menu');
+                if (userMenu && userMenu.style.display === 'block') {
+                    userMenu.style.display = 'none';
+                }
+            }
+            if (!event.target.matches('.bottom-right-button')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username') || 'Invitado';
+            document.getElementById('username-display').textContent = username;
+
+            loadSupermarkets();
+            loadAlertProducts();
+        });
+
+        function loadSupermarkets() {
+            const supermarkets = [
+                { imagen: "file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(11).png", name: 'Dia' },
+                { imagen: "file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(10).png", name: 'Disco' },
+                { imagen: "file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/coto.png", name: 'Coto' }
+            ];
+
+            const supermarketGrid = document.getElementById('supermarket-grid');
+            supermarkets.forEach(supermarket => {
+                const supermarketElement = document.createElement('div');
+                supermarketElement.className = 'supermarket-item';
+                supermarketElement.innerHTML = `
+                    <div>
+                        <img src="${supermarket.imagen}" alt="${supermarket.name}">
+                        <h3>${supermarket.name}</h3>
+                    </div>
+                    <button class="alert-button" onclick="toggleSupermarketAlert(this, '${supermarket.imagen}')">
+                        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/alarma_apagada.png" alt="Alarma">
+                    </button>
+                `;
+                supermarketGrid.appendChild(supermarketElement);
+            });
+        }
+
+        function loadAlertProducts() {
+            const email = localStorage.getItem('email') || 'Invitado';
+            fetch('http://localhost:8080/get-alert-products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ usuarioEmail: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const productGrid = document.getElementById('product-grid');
+                productGrid.innerHTML = ''; // Clear existing products
+                data.products.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'product-item';
+                    productElement.innerHTML = `
+                        <img src="${product.imagen}" alt="${product.descripcion}">
+                        <h3>${product.descripcion}</h3>
+                        <p>Precio: $${product.precio}</p>
+                        <button class="alert-button" onclick="removeProductAlert(this, ${product.id})">
+                            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/alarma.png" alt="Alarma">
+                        </button>
+                    `;
+                    productGrid.appendChild(productElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading alert products:', error);
+            });
+        }
+
+        function toggleSupermarketAlert(button, imagenSupermercado) {
+            const email = localStorage.getItem('email') || 'Invitado';
+            fetch('http://localhost:8080/toggle-supermarket-alert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    imagen_supermercado: imagenSupermercado,
+                    usuario_mail: email 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const img = button.querySelector('img');
+                    if (data.isActive) {
+                        img.src = "file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/alarma.png";
+                    } else {
+                        img.src = "file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/alarma_apagada.png";
+                    }
+                } else {
+                    alert('Error al cambiar el estado de la alerta del supermercado');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling supermarket alert:', error);
+                alert('Error al cambiar el estado de la alerta del supermercado');
+            });
+        }
+
+        function removeProductAlert(button, productId) {
+            const email = localStorage.getItem('email') || 'Invitado';
+            fetch('http://localhost:8080/remove-product-alert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    productId: productId,
+                    usuarioEmail: email 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.closest('.product-item').remove();
+                } else {
+                    alert('Error al desactivar la alerta del producto');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing product alert:', error);
+                alert('Error al desactivar la alerta del producto');
+            });
+        }
+    </script>
+</body>
+</html>

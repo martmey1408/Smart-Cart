@@ -1,0 +1,75 @@
+import asyncio
+from playwright.async_api import async_playwright
+
+async def buscar_producto_disco(nombre):
+    productos_encontrados = []
+    
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)  # Activar modo headless para mayor velocidad
+        page = await browser.new_page()
+        url = f"https://www.disco.com.ar/{nombre}?_q={nombre}&map=ft"
+
+        try:
+            print('Navegando a:', url)
+            await page.goto(url, wait_until='networkidle', timeout=10000)  # Timeout ajustado
+            print('Página cargada')
+
+            await page.wait_for_selector('.vtex-search-result-3-x-galleryItem', timeout=3000)
+            print('Selector de productos encontrado')
+
+            # Scroll hasta el final de la página con límite de intentos
+            max_scroll_attempts = 5
+            for _ in range(max_scroll_attempts):
+                last_height = await page.evaluate('document.body.scrollHeight')
+                await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                await page.wait_for_timeout(1000)  # Reducido a 1 segundo
+                new_height = await page.evaluate('document.body.scrollHeight')
+                if new_height == last_height:
+                    break
+
+            productos = await page.query_selector_all('.vtex-search-result-3-x-galleryItem')
+            print(f'Se encontraron {len(productos)} productos en la página')
+
+            # Extraer datos en paralelo
+            tasks = [extraer_datos_producto(producto) for producto in productos]
+            productos_encontrados = await asyncio.gather(*tasks)
+
+        except Exception as error:
+            print('Error al extraer los productos:', error)
+        
+        finally:
+            await browser.close()
+
+    return productos_encontrados
+
+async def extraer_datos_producto(producto):
+    try:
+        nombre_elem = await producto.query_selector('.vtex-product-summary-2-x-productBrand')
+        precio_elem = await producto.query_selector('#priceContainer')
+        imagen_elem = await producto.query_selector('img.vtex-product-summary-2-x-image')
+        enlace_elem = await producto.query_selector('a.vtex-product-summary-2-x-clearLink')
+
+        nombre = await nombre_elem.inner_text() if nombre_elem else "No disponible"
+        precio = await precio_elem.inner_text() if precio_elem else "0"
+        imagen = await imagen_elem.get_attribute('src') if imagen_elem else "No se encontró imagen"
+        enlace = 'https://www.disco.com.ar' + await enlace_elem.get_attribute('href') if enlace_elem else "No se encontró enlace"
+
+        # Limpieza de precio
+        precio_limpio = ''.join(filter(lambda x: x.isdigit() or x in ['.', ','], precio))
+        if ',' in precio_limpio:
+            enteros, decimales = precio_limpio.split(',')
+            precio_numero = float(enteros.replace('.', '') + '.' + decimales)
+        else:
+            precio_numero = float(precio_limpio.replace('.', ''))
+
+        return {'nombre': nombre, 'precio': precio_numero, 'imagen': imagen, 'enlace': enlace}
+
+    except Exception as e:
+        print(f"Error al procesar un producto: {e}")
+        return {}
+
+# Ejemplo de uso:
+if __name__ == "__main__":
+    resultados = asyncio.run(buscar_producto_disco('papa'))
+    for producto in resultados:
+        print(producto)

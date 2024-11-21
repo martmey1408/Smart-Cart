@@ -1,0 +1,43 @@
+from playwright.sync_api import sync_playwright
+
+def main(nombre):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # Cambia a True para modo headless
+        page = browser.new_page()
+        url = "https://www.cotodigital3.com.ar/sitios/cdigi/browse?_dyncharset=utf-8&Dy=1&Ntt="+nombre+"&Nty=1&Ntk=&siteScope=ok&_D%3AsiteScope=+&atg_store_searchInput="+nombre+"&idSucursal=200&_D%3AidSucursal=+&search=Ir&_D%3Asearch=+&_DARGS=%2Fsitios%2Fcartridges%2FSearchBox%2FSearchBox.jsp"
+        
+        # Navega a la URL
+        page.goto(url)
+        
+        # Espera a que el contenido esté disponible
+        page.wait_for_load_state('networkidle')
+        
+        # Asegúrate de que los elementos se carguen
+        page.wait_for_selector("ul#products")
+        
+        # Extrae los productos
+        productos = page.query_selector_all("ul#products li")
+        if not productos:
+            print("No se encontraron productos. Verifica el selector.")
+        
+
+        for producto in productos:
+            nombre = producto.query_selector("span.span_productName")
+            precio = producto.query_selector("span.atg_store_newPrice")
+            imagen = producto.query_selector("span.atg_store_productImage img")
+            pagina=producto.query_selector("div.product_info_container a")
+            
+
+            if nombre and precio and imagen and pagina:
+                print(nombre.inner_text().strip(), precio.inner_text().strip(), imagen.get_attribute("src"), pagina.get_attribute("href"))
+                
+                
+                print("--------------------")
+            else:
+                print("No se pudo encontrar el nombre, precio, o imagen del producto.")
+        
+        # Cierra el navegador
+        browser.close()
+
+if __name__ == "__main__":
+    main("carne")

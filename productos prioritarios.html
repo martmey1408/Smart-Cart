@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos Prioritarios - Smart Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FF3232;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .navbar-left, .navbar-center, .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .menu-icon img {
+            width: 30px;
+        }
+    
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            width: 200px;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            display: none;
+            z-index: 100;
+        }
+
+        .menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu li:last-child {
+            border-bottom: none;
+        }
+
+        .menu li:hover {
+            background-color: #e0e0e0;
+        }
+
+        .menu li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .logo {
+            height: 70px;
+        }
+
+        .username {
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: small;
+        }
+
+        .user-icon {
+            width: 20px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .user-section {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .user-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .container h1 {
+            align-self: flex-start;
+            margin-bottom: 20px;
+        }
+
+        #priority-products-list {
+            width: 100%;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 20px;
+            box-sizing: border-box;
+        }
+
+        .product-item {
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background-color: white;
+            box-sizing: border-box;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .product-details h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #FF3232;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .action-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Estilo para la barra de desplazamiento */
+        #priority-products-list::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #priority-products-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #priority-products-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+
+        #priority-products-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <button class="menu-icon" onclick="toggleMenu()">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/png-transparent-hamburger-button-computer-icons-marmon-keystone-canada-menu-red-sea-thumbnail.jpg" alt="Menu Icon">
+            </button>
+            
+            <ul id="menu-list" class="menu hidden">
+                <li><a href="recetas.html">Ver todas las recetas</a></li>
+                <li><a href="productos prioritarios.html">Ver los productos prioritarios</a></li>
+                <li><a href="configurar alertas.html">Configurar alertas</a></li>
+                <li><a href="tendencia de gastos.html">Tendencias de Gastos</a></li>
+            </ul>
+        </div>
+        <div class="navbar-center">
+            <a href="home.html">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo" class="logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <div class="user-section" onclick="toggleUserMenu(event)">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(2).png" alt="User Icon" class="user-icon">
+                <span class="username" id="username-display"></span>
+            </div>
+            <div id="user-menu" class="user-menu">
+                <button onclick="manageProfile()">Gestión de perfil</button>
+                <button onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Productos Prioritarios</h1>
+        <div id="priority-products-list">
+            <!-- Los productos prioritarios se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username') || 'Invitado';
+            document.getElementById('username-display').textContent = username;
+
+            fetchPriorityProducts(localStorage.getItem('email'));
+        });
+
+        function toggleMenu() {
+            const menuList = document.getElementById('menu-list');
+            menuList.classList.toggle('show');
+        }
+
+        function toggleUserMenu(event) {
+            const userMenu = document.getElementById('user-menu');
+            if (userMenu.style.display === 'block') {
+                userMenu.style.display = 'none';
+            } else {
+                userMenu.style.display = 'block';
+            }
+            event.stopPropagation();
+        }
+
+        document.addEventListener('click', function() {
+            const userMenu = document.getElementById('user-menu');
+            userMenu.style.display = 'none';
+        });
+
+        document.getElementById('user-menu').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        function manageProfile() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
+            window.location.href = 'inicio de sesion.html';
+        }
+
+        async function fetchPriorityProducts(email) {
+            try {
+                const response = await fetch('http://localhost:8080/get-priority-products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ usuarioEmail: email }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displayPriorityProducts(data.products);
+            } catch (error) {
+                console.error('Error fetching priority products:', error);
+            }
+        }
+
+        function displayPriorityProducts(products) {
+            const productsList = document.getElementById('priority-products-list');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product-item';
+                productElement.innerHTML = `
+                    <div class="product-info">
+                        <img src="${product.imagen}" alt="${product.descripcion}" class="product-image">
+                        <div class="product-details">
+                            <h2>${product.descripcion}</h2>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button onclick="activate-product-alert(${product.id})" class="action-button">
+                            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/alarma.png" alt="Activar alarma">
+                        </button>
+                        <button onclick="removePriorityProduct(${product.id})" class="action-button">
+                            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/tacho.png" alt="Eliminar">
+                        </button>
+                    </div>
+                `;
+                productsList.appendChild(productElement);
+            });
+        }
+
+        async function removePriorityProduct(productId) {
+            const email = localStorage.getItem('email');
+            try {
+                const response = await fetch('http://localhost:8080/remove-priority-product', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId, usuarioEmail: email }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                fetchPriorityProducts(email);
+            } catch (error) {
+                console.error('Error removing priority product:', error);
+            }
+        }
+
+        function activateAlarm(productId, email) {
+            // Implementar activación de alarma
+        }
+    </script>
+</body>
+</html>

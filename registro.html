@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .register-container {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        .register-container img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .register-container h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .register-container input[type="text"],
+        .register-container input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;     
+            font-weight: bold;  
+            font-style: italic;
+        }
+        .register-container a {
+            color: #000;
+            text-decoration: none;
+        }
+        .register-container .forgot-password {
+            text-decoration: underline;
+        }
+        .register-container button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .register-container .login {
+            margin-top: 10px;
+        }
+        .register-container .login a {
+            text-decoration: underline;
+        }
+        .register-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .register-container .password-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .register-container .password-container input {
+            width: calc(50% - 10px);
+        }
+
+    
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo">
+        <h2><strong><em>Crear usuario</em></strong></h2>
+        <form id="register-form">
+    <div id="email-error" style="color: red;"></div>
+    <input type="text" id="email" placeholder="Correo electrónico" required>
+
+    <div id="username-error" style="color: red;"></div>
+    <input type="text" id="username" placeholder="Nombre de usuario" required>
+
+    <div id="password-error" style="color: red;"></div>
+    <input type="password" id="password" placeholder="Contraseña" required>
+
+    <button type="submit">Registrar</button>
+    <div class="login">
+        <strong><em>Ya tienes cuenta? <a href="inicio de sesion.html">Iniciar sesión</a></em></strong>
+    </div>
+</form>
+    </div>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            var email = document.getElementById('email').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+    
+            // Limpiar mensajes de error
+            document.getElementById('email-error').textContent = '';
+            document.getElementById('username-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
+    
+            // Verificar que el email contiene un @
+            if (!email.includes('@')) {
+                document.getElementById('email-error').textContent = 'El correo electrónico debe contener un @';
+                return;
+            }
+    
+            // Verificar que la contraseña tiene al menos 9 caracteres
+            if (password.length < 9) {
+                document.getElementById('password-error').textContent = 'La contraseña debe tener al menos 9 caracteres';
+                return;
+            }
+    
+            // Verificar que la contraseña contiene al menos un caracter especial
+            var specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '='];
+            var containsSpecialCharacter = specialCharacters.some(function(character) {
+                return password.includes(character);
+            });
+    
+            if (!containsSpecialCharacter) {
+                document.getElementById('password-error').textContent = 'La contraseña debe contener al menos un caracter especial';
+                return;
+            }
+    
+            // Resto del código...
+            fetch('http://localhost:8080/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    username: username,
+                    password: password,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Usuario registrado exitosamente. Serás redirigido a la página de inicio de sesión.');
+                    window.location.href = 'inicio de sesion.html';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

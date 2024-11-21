@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetas - Smart Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FF3232;
+            padding: 10px 20px;
+            position: relative;
+        }
+        .navbar-left, .navbar-center, .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+        .menu-icon {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .menu-icon img {
+            width: 30px;
+        }
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            width: 200px;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            display: none;
+            z-index: 100;
+        }
+        .menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+        }
+        .menu li:last-child {
+            border-bottom: none;
+        }
+        .menu li:hover {
+            background-color: #e0e0e0;
+        }
+        .menu li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        .logo {
+            height: 70px;
+        }
+        .username {
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: small;
+        }
+        .user-icon {
+            width: 20px;
+            height: auto;
+            margin-right: 10px;
+        }
+        .user-section {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .user-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+        }
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+        .category-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .category-button {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+        }
+        .category-button.active {
+            background-color: #FF3232;
+            color: white;
+        }
+        .recipes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+        .recipe-card {
+            width: calc(50% - 20px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+        .recipe-name {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        .recipe-content {
+            display: flex;
+            padding: 10px;
+        }
+        .recipe-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .recipe-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .recipe-ingredients {
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+        .recipe-ingredients h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .recipe-ingredients ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        .add-to-list-button {
+            background-color: #FF3232;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            align-self: flex-end;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .recipe-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <button class="menu-icon" onclick="toggleMenu()">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/png-transparent-hamburger-button-computer-icons-marmon-keystone-canada-menu-red-sea-thumbnail.jpg" alt="Menu Icon">
+            </button>
+            
+            <ul id="menu-list" class="menu">
+                <li><a href="#">Ver todas las recetas</a></li>
+                <li><a href="productos prioritarios.html">Ver los productos prioritarios</a></li>
+                <li><a href="configurar alertas.html">Configurar alertas</a></li>
+                <li><a href="tendencia de gastos.html">Tendencias de Gastos</a></li>
+            </ul>
+        </div>
+        <div class="navbar-center">
+            
+            <a href="home.html">
+            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="Smart Cart Logo" class="logo">
+        </a>
+        </div>
+        <div class="navbar-right">
+            <div class="user-section" onclick="toggleUserMenu(event)">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(2).png" alt="User Icon" class="user-icon">
+                <span class="username" id="username-display"></span>
+            </div>
+            <div id="user-menu" class="user-menu">
+                <button onclick="manageProfile()">Gestión de perfil</button>
+                <button onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="category-buttons">
+        <button class="category-button active" data-category="Carnes">Carnes</button>
+        <button class="category-button" data-category="Pastas">Pastas</button>
+        <button class="category-button" data-category="Veganas">Veganas</button>
+        <button class="category-button" data-category="Vegetarianas">Vegetarianas</button>
+        <button class="category-button" data-category="Dulces">Dulces</button>
+        <button class="category-button" data-category="Saladas">Saladas</button>
+    </div>
+
+    <div id="recipes-container" class="recipes-container"></div>
+
+    <script>
+        function toggleMenu() {
+            const menuList = document.getElementById('menu-list');
+            menuList.style.display = menuList.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleUserMenu(event) {
+            const userMenu = document.getElementById('user-menu');
+            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+            event.stopPropagation();
+        }
+
+        function manageProfile() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            window.location.href = 'inicio de sesion.html';
+        }
+
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu');
+            const userSection = document.querySelector('.user-section');
+            if (!userSection.contains(event.target)) {
+                userMenu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username');
+            document.getElementById('username-display').innerText = username ? username : 'Invitado';
+
+            const recipesContainer = document.getElementById('recipes-container');
+            const categoryButtons = document.querySelectorAll('.category-button');
+            async function fetchRecipes(category) {
+    try {
+        const response = await fetch(`http://localhost:8080/recipes?category=${category}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const recipes = await response.json();
+        console.log('Fetched recipes:', recipes); // Verifica aquí si las recetas llegan correctamente
+        displayRecipes(recipes);
+    } catch (error) {
+        console.error('Error fetching recipes:', error);
+        recipesContainer.innerHTML = '<p>Error al cargar las recetas. Por favor, intente de nuevo más tarde.</p>';
+    }
+}
+
+    function displayRecipes(recipes) {
+            recipesContainer.innerHTML = '';
+            if (recipes.length === 0) {
+                recipesContainer.innerHTML = '<p>No se encontraron recetas para esta categoría.</p>';
+                return;
+            }
+
+            recipes.forEach(recipe => {
+                console.log('Recipe:', recipe); // Asegúrate de que estás recibiendo los datos esperados para cada receta
+                const recipeCard = document.createElement('div');
+                recipeCard.className = 'recipe-card';
+                recipeCard.innerHTML = `
+                    <div class="recipe-name">${recipe.nombrereceta}</div>
+                    <div class="recipe-content">
+                        <img src="${recipe.imagen || 'placeholder.jpg'}" alt="${recipe.nombrereceta}" class="recipe-image">
+                        <div class="recipe-details">
+                            <div class="recipe-ingredients">
+                                <h4>Ingredientes:</h4>
+                                <ul>
+                                    ${recipe.ingredientes && recipe.ingredientes.length > 0 
+                                        ? recipe.ingredientes.map(ing => `<li>${ing.nombreIngrediente}</li>`).join('') 
+                                        : '<li>No hay ingredientes disponibles</li>'
+                                    }
+                                </ul>
+                            </div>
+                            <button class="add-to-list-button">Agregar productos a lista de compras</button>
+                        </div>
+                    </div>
+                `;
+                recipesContainer.appendChild(recipeCard);
+            });
+        }
+
+
+
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    fetchRecipes(button.dataset.category);
+                });
+            });
+
+            // Fetch recipes for the default category (Carnes)
+            fetchRecipes('Carnes');
+        });
+    </script>
+</body>
+</html>

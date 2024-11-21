@@ -1,0 +1,163 @@
+
+import * as playwright from 'playwright';
+const pw = playwright;
+
+async function buscar_producto_disco(nombre: string) {
+  const productos_encontrados: any[] = [];
+
+  try {
+    const browser = await playwright.chromium.launch({ headless: true });
+    const page = await browser.newPage();
+    const url = `https://www.example.com/search?q=${nombre}`;
+    await page.goto(url);
+    await page.waitForLoadState('networkidle');
+    const productos = await page.$$('.product');
+
+    for (const producto of productos) {
+      const nombre_elem = await producto.$('.name');
+      const precio_elem = await producto.$('.price');
+      const imagen_elem = await producto.$('.image');
+      const enlace_elem = await producto.$('.link');
+
+      const nombre = await nombre_elem?.textContent();
+      const precio = await precio_elem?.textContent();
+      const imagen = await imagen_elem?.getAttribute('src');
+      const enlace = await enlace_elem?.getAttribute('href');
+
+      productos_encontrados.push({
+        nombre,
+        precio,
+        imagen,
+        enlace,
+      });
+    }
+
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+
+  return productos_encontrados;
+}
+
+async function extraer_datos_producto_disco(producto: any) {
+  const { nombre, precio, imagen, enlace } = producto;
+
+  try {
+    const browser = await playwright.chromium.launch({ headless: true });
+    const page = await browser.newPage();
+    const url = `https://www.example.com${enlace}`;
+    await page.goto(url);
+    await page.waitForLoadState('networkidle');
+    const descripcion_elem = await page.$('.description');
+    const descripcion = descripcion_elem ? await descripcion_elem.textContent() : '';
+
+    await browser.close();
+
+    return {
+      nombre,
+      precio,
+      imagen,
+      enlace,
+      descripcion,
+    };
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+(async () => {
+  const productos = await buscar_producto_disco('disco duro');
+  const tasks = productos.map((producto) => extraer_datos_producto_disco(producto));
+  const productos_completos = await Promise.all(tasks);
+  console.log(productos_completos);
+})();
+
+        const nombre = await nombre_elem.inner_text() if nombre_elem else "No disponible"
+        const precio = await precio_elem.inner_text() if precio_elem else "0"
+        imagen = await imagen_elem.get_attribute('src') if imagen_elem else ""
+        enlace = 'https://www.disco.com.ar' + await enlace_elem.get_attribute('href') if enlace_elem else ""
+
+        return {'nombre': nombre, 'precio': precio, 'imagen': imagen, 'enlace': enlace}
+    except Exception as e:
+        print(f"Error al extraer producto Disco: {e}")
+        return {}
+
+async def buscar_producto_coto(nombre):
+    productos_encontrados = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        url = f"https://www.cotodigital3.com.ar/sitios/cdigi/browse?_dyncharset=utf-8&Dy=1&Ntt={nombre}&Nty=1&Ntk=&siteScope=ok&_D%3AsiteScope=+&atg_store_searchInput={nombre}&idSucursal=200&_D%3AidSucursal=+&search=Ir"
+        try:
+            await page.goto(url, wait_until='networkidle')
+            await page.wait_for_selector("ul#products li", timeout=5000)
+            productos = await page.query_selector_all("ul#products li")
+            for producto in productos:
+                nombre_elem = await producto.query_selector("span.span_productName")
+                precio_elem = await producto.query_selector("span.atg_store_newPrice")
+                imagen_elem = await producto.query_selector("span.atg_store_productImage img")
+                enlace_elem = await producto.query_selector("div.product_info_container a")
+                if nombre_elem and precio_elem and imagen_elem and enlace_elem:
+                    productos_encontrados.append({
+                        'nombre': await nombre_elem.inner_text(),
+                        'precio': await precio_elem.inner_text(),
+                        'imagen': await imagen_elem.get_attribute('src'),
+                        'enlace': await enlace_elem.get_attribute('href'),
+                    })
+        except Exception as e:
+            print(f"Error en Coto: {e}")
+        finally:
+            await browser.close()
+    return productos_encontrados
+
+async def buscar_producto_dia(nombre):
+    productos_encontrados = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        url = f'https://diaonline.supermercadosdia.com.ar/{nombre}?_q={nombre}&map=ft'
+        try:
+            await page.goto(url, wait_until='domcontentloaded')
+            await page.wait_for_selector('.vtex-product-summary-2-x-container', timeout=5000)
+            productos = await page.query_selector_all('.vtex-product-summary-2-x-container')
+            for producto in productos:
+                nombre_elem = await producto.query_selector('.vtex-product-summary-2-x-productBrand') or \
+                              await producto.query_selector('.vtex-product-summary-2-x-productName')
+                precio_elem = await producto.query_selector('.vtex-product-price-1-x-sellingPriceValue') or \
+                              await producto.query_selector('.vtex-product-price-1-x-currencyInteger')
+                imagen_elem = await producto.query_selector('img')
+                enlace_elem = await producto.query_selector('a.vtex-product-summary-2-x-clearLink')
+                if nombre_elem and precio_elem and imagen_elem and enlace_elem:
+                    productos_encontrados.append({
+                        'nombre': await nombre_elem.inner_text(),
+                        'precio': await precio_elem.inner_text(),
+                        'imagen': await imagen_elem.get_attribute('src'),
+                        'enlace': 'https://diaonline.supermercadosdia.com.ar' + await enlace_elem.get_attribute('href'),
+                    })
+        except Exception as e:
+            print(f"Error en Día: {e}")
+        finally:
+            await browser.close()
+    return productos_encontrados
+
+async def buscar_productos(nombre):
+    resultados = await asyncio.gather(
+        buscar_producto_disco(nombre),
+        buscar_producto_coto(nombre),
+        buscar_producto_dia(nombre)
+    )
+    return {
+        "Disco": resultados[0],
+        "Coto": resultados[1],
+        "Día": resultados[2]
+    }
+
+if __name__ == "__main__":
+    nombre_producto = "zanahoria"
+    resultados = asyncio.run(buscar_productos(nombre_producto))
+    for supermercado, productos in resultados.items():
+        print(f"Productos en {supermercado}:")
+        for producto in productos:
+            print(producto)
+        print()

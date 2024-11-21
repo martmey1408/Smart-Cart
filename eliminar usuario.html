@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Usuario</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FF3232;
+            padding: 10px 20px;
+            position: relative;
+        }
+        .menu-icon {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .menu-icon img {
+            width: 30px;
+        }
+        .logo {
+            height: 70px;
+        }
+        .user-icon {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .username {
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: small;
+        }
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            width: 200px;
+            position: absolute;
+            top: 80px; /* Ajustado para que esté más abajo */
+            left: 0;  /* Alineación horizontal */
+            display: none;
+            z-index: 100; /* Asegura que el menú aparezca por encima de otros elementos */
+        }
+
+        .menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease; /* Transición suave para el efecto hover */
+        }
+
+        .menu li:last-child {
+            border-bottom: none;
+        }
+
+        .menu li:hover {
+            background-color: #e0e0e0; /* Color de fondo cuando pasas el mouse sobre una opción */
+        }
+
+        .menu li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #ffffff;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 160px;
+            padding: 12px 16px;
+            z-index: 10;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .user-menu button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            height: 100vh;
+            position: absolute;
+            top: 100px;
+            left: 0;
+        }
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-style: italic;
+            border: 1px solid gray;
+            margin-bottom: 1px;
+        }
+        .sidebar a:hover {
+            background-color: #e0e0e0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px;
+            margin-left: 220px;
+        }
+        .delete-container {
+            background-color: #fff;
+            padding: 20px;
+            width: 500px;
+            border: 1px solid gray;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .delete-container h2 {
+            font-weight: bold;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .delete-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .delete-container input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .delete-container button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .delete-container .warning {
+            color: red;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .delete-container .warning img {
+            vertical-align: middle;
+            margin-right: 5px;
+            width: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <button class="menu-icon" onclick="toggleMenu()">
+            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/png-transparent-hamburger-button-computer-icons-marmon-keystone-canada-menu-red-sea-thumbnail.jpg" alt="Menu Icon">
+        </button>
+        <ul id="menu-list" class="menu hidden">
+            <li><a href="#">Ver todas las recetas</a></li>
+            <li><a href="#">Ver los productos prioritarios</a></li>
+            <li><a href="#">Configurar alertas</a></li>
+            <li><a href="#">Tendencias de Gastos</a></li>
+        </ul>
+        <a href="home.html">
+            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo" class="logo">
+        </a>
+        <div class="user-section" onclick="toggleUserMenu(event)">
+            <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(2).png" alt="User Icon" class="user-icon">
+            <span class="username" id="username-display"></span>
+        </div>
+        <div id="user-menu" class="user-menu">
+            <button onclick="manageProfile()">Gestión de perfil</button>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <a href="Gestion de usuario.html">Perfil</a>
+        <a href="eliminar usuario.html">Eliminar usuario</a>
+        <a href="nueva contraseña.html">Cambiar contraseña</a>
+        <a href="historial de compras.html">Historial de compras</a>
+    </div>
+    
+    <div class="container">
+        <div class="delete-container">
+            <h2>Eliminar usuario</h2>
+            <p class="warning">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/warning.png" alt="Warning Icon">
+                ATENCIÓN! Estás a punto de eliminar tu cuenta.
+            </p>
+            <p>Al eliminar tu cuenta, se borrarán todos tus datos asociados, incluyendo tu historial de compras, preferencias de productos y cualquier otra información guardada en tu cuenta. Esta acción es irreversible y no podrás recuperar tu cuenta ni los datos eliminados.</p>
+            <label for="password">Ingrese su contraseña:</label>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <p>¿Estás seguro de que deseas continuar y eliminar tu cuenta?</p>
+            <button type="button" onclick="deleteAccount()">Aceptar</button>
+            <button type="button" onclick="cancelDelete()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('menu-list');
+            menu.className = menu.className === 'menu hidden' ? 'menu show' : 'menu hidden';
+        }
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const userMenu = document.getElementById('user-menu');
+            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function manageProfile() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-section') && !event.target.closest('.user-menu')) {
+                const userMenu = document.getElementById('user-menu');
+                if (userMenu && userMenu.style.display === 'block') {
+                    userMenu.style.display = 'none';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('username-display').innerText = username;
+            } else {
+                document.getElementById('username-display').innerText = 'Invitado';
+            }
+        });
+
+        document.getElementById('deleteAccountForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            deleteAccount();
+        });
+
+        function deleteAccount() {
+            const password = document.getElementById('password').value;
+            const username = localStorage.getItem('username');
+
+            if (!username) {
+                alert('No se encontró el nombre de usuario. Por favor, inicia sesión nuevamente.');
+                return;
+            }
+
+            fetch('http://localhost:8080/delete-account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password, username: username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cuenta eliminada exitosamente.');
+                    localStorage.removeItem('username');
+                    window.location.href = 'inicio de sesion.html';
+                } else {
+                    alert('Error al eliminar la cuenta: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar la cuenta. Por favor, inténtelo de nuevo más tarde.');
+            });
+        }
+
+        function cancelDelete() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+    </script>
+</body>
+</html>
+
+
+

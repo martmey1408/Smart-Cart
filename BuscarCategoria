@@ -1,0 +1,46 @@
+from playwright.sync_api import sync_playwright
+
+def buscarCategoria(nombre, link):
+    def main(link):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=False)  # Cambia a True para modo headless
+            page = browser.new_page()
+
+            # Navega a la URL
+            page.goto(link)
+            # Espera a que el contenido esté disponible
+            page.wait_for_load_state('networkidle')
+
+            if nombre == 'Coto':
+                # Selecciona el div que contiene los enlaces
+                breadcrumb_div = page.query_selector("div.row #atg_store_breadcrumbs")
+                if breadcrumb_div:
+                    # Encuentra todos los enlaces dentro del div
+                    enlaces = breadcrumb_div.query_selector_all("a")
+                    # Verifica que haya al menos 4 enlaces
+                    if len(enlaces) >= 4:
+                        cuarto_enlace = enlaces[3]
+                        texto_cuarto_enlace = cuarto_enlace.query_selector("p").inner_text().strip()
+                        print(texto_cuarto_enlace)
+                    else:
+                        print("No hay suficientes enlaces en el breadcrumb.")
+                else:
+                    print("No se encontró el div de breadcrumbs.")
+            else:
+                # Otra lógica para páginas que no sean 'Coto'
+                categoria_link = page.query_selector(
+                    ".vtex-breadcrumb-1-x-link.vtex-breadcrumb-1-x-link--breadcrumb-style.vtex-breadcrumb-1-x-link--2.vtex-breadcrumb-1-x-link--breadcrumb-style--2.dib.pv1.link.ph2.c-muted-2.hover-c-link"
+                )
+                if categoria_link:
+                    print(categoria_link.inner_text().strip())  # Imprime el texto de la categoría
+                else:
+                    print("No se encontró el enlace de categoría.")
+            
+            # Cierra el navegador
+            browser.close()
+
+    # Ejecuta la función principal
+    main(link)
+
+# Ejemplo de uso
+buscarCategoria("Disco", "https://www.disco.com.ar/papa-lavada-por-kg/p")

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Cart - Historial de Compras</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FF3232;
+            padding: 10px 20px;
+            position: relative;
+        }
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            width: 200px;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            display: none;
+            z-index: 100;
+        }
+
+        .menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu li:last-child {
+            border-bottom: none;
+        }
+
+        .menu li:hover {
+            background-color: #e0e0e0;
+        }
+
+        .menu li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .menu-icon {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .menu-icon img {
+            width: 30px;
+        }
+
+        .logo {
+            height: 70px;
+        }
+
+        .user-icon {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .username {
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: small;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #ffffff;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 160px;
+            padding: 12px 16px;
+            z-index: 10;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .user-menu button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            height: 100vh;
+            position: absolute;
+            top: 100px;
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-style: italic;
+            border: 1px solid gray;
+            margin-bottom: 1px;
+            border-spacing: 5px;
+        }
+
+        .sidebar a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px;
+            margin-left: 220px;
+        }
+
+        .shopping-history {
+            background-color: #fff;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid gray;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .shopping-history h2 {
+            margin-bottom: 20px;
+            color: #FF3232;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-container select,
+        .filter-container input,
+        .filter-container button {
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+        .purchase-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .purchase-item {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .purchase-date {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .purchase-total {
+            font-weight: bold;
+            color: #FF3232;
+            margin-top: 10px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .product-item {
+            border: 1px solid #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            width: calc(50% - 5px);
+            display: flex;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .product-details {
+            flex-grow: 1;
+        }
+
+        .filter-container button {
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .filter-container button:hover {
+            background-color: #333333;
+        }
+
+        #filter-type {
+            background-color: #FF7272;
+            color: #ffffff;
+            border: none;
+            padding: 5px;
+            font-style: italic;
+            cursor: pointer;
+        }
+
+        #filter-type option {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        #filter-type option:hover,
+        #filter-type option:focus,
+        #filter-type option:active {
+            background-color: #FF7272;
+            color: #ffffff;
+        }
+
+        #filter-date {
+            border: 1px solid #000000;
+            padding: 5px;
+        }
+
+        #filter-type::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #filter-type::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #filter-type::-webkit-scrollbar-thumb {
+            background: #FF7272;
+        }
+
+        #filter-type::-webkit-scrollbar-thumb:hover {
+            background: #FF5555;
+        }
+
+        .export-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .export-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 10px;
+        }
+
+        .export-buttons img {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <button class="menu-icon"  onclick="toggleMenu()">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/png-transparent-hamburger-button-computer-icons-marmon-keystone-canada-menu-red-sea-thumbnail.jpg" alt="Menu Icon">
+            </button>
+            <ul id="menu-list" class="menu hidden">
+                <li><a href="recetas.html">Ver todas las recetas</a></li>
+                <li><a href="productos prioritarios.html">Ver los productos prioritarios</a></li>
+                <li><a href="configurar alertas.html">Configurar alertas</a></li>
+                <li><a href="tendencia de gastos.html">Tendencias de Gastos</a></li>
+            </ul>
+        </div>
+        <div class="navbar-center">
+            <a href="home.html">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="Smart Cart Logo" class="logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <div class="user-section" onclick="toggleUserMenu(event)">
+                <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/image-removebg-preview%20(2).png" alt="User Icon" class="user-icon">
+                <span class="username" id="username-display"></span>
+            </div>
+            <div id="user-menu" class="user-menu">
+                <button onclick="manageProfile()">Gestión de perfil</button>
+                <button onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+    </header>
+    <div class="sidebar">
+        <a href="Gestion de usuario.html">Perfil</a>
+        <a href="eliminar usuario.html">Eliminar usuario</a>
+        <a href="nueva contraseña.html">Cambiar contraseña</a>
+        <a href="historial de compras.html">Historial de compras</a>
+    </div>
+    <div class="container">
+        <div class="shopping-history">
+            <h2>Historial de Compras</h2>
+            <div class="filter-container">
+                <div class="export-buttons">
+                    <button onclick="exportToExcel()" title="Exportar a Excel">
+                        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/excel.png" alt="Excel">
+                    </button>
+                    <button onclick="generatePDF()" title="Generar PDF">
+                        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/pdf.png" alt="PDF">
+                    </button>
+                </div>
+                <div>
+                    <select id="filter-type">
+                        <option value="all">Todas las fechas</option>
+                        <option value="specific">Fecha específica</option>
+                        <option value="month">Mes</option>
+                        <option value="year">Año</option>
+                    </select>
+                    <input type="date" id="filter-date" style="display: none;">
+                    <button onclick="applyFilter()">Aplicar filtro</button>
+                </div>
+            </div>
+            <div id="purchase-history-container" class="purchase-list">
+                <!-- Purchase history will be loaded here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            const menuList = document.getElementById('menu-list');
+            menuList.classList.toggle('show');
+        } 
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const userMenu = document.getElementById('user-menu');
+            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+        }
+    
+        function manageProfile() {
+            window.location.href = 'Gestion de usuario.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
+            window.location.href = 'inicio de sesion.html';
+        }
+    
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-section') && !event.target.closest('.user-menu')) {
+                const userMenu = document.getElementById('user-menu');
+                if (userMenu && userMenu.style.display === 'block') {
+                    userMenu.style.display = 'none';
+                }
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById('username-display').innerText = username;
+                fetchAndDisplayShoppingHistory();
+            } else {
+                document.getElementById('username-display').innerText = 'Invitado';
+            }
+
+            document.getElementById('filter-type').addEventListener('change', function() {
+                const dateInput = document.getElementById('filter-date');
+                dateInput.style.display = this.value !== 'all' ? 'inline-block' : 'none';
+                if (this.value === 'month') {
+                    dateInput.type = 'month';
+                } else if (this.value === 'year') {
+                    dateInput.type = 'number';
+                    dateInput.min = '2000';
+                    dateInput.max = new Date().getFullYear().toString();
+                } else {
+                    dateInput.type = 'date';
+                }
+            });
+        });
+
+        function applyFilter() {
+            fetchAndDisplayShoppingHistory();
+        }
+
+        function fetchAndDisplayShoppingHistory() {
+            const mail = localStorage.getItem('email');
+            if (!mail) {
+                document.getElementById('purchase-history-container').innerHTML = '<p>Por favor, inicia sesión para ver tu historial de compras.</p>';
+                return;
+            }
+
+            const filterType = document.getElementById('filter-type').value;
+            const filterDate = document.getElementById('filter-date').value;
+
+            let filterData = null;
+            if (filterType !== 'all' && filterDate) {
+                filterData = { type: filterType, value: filterDate };
+            }
+
+            fetch('http://localhost:8080/get-shopping-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mail: mail, filterDate: filterData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('shoppingHistory', JSON.stringify(data.shoppingHistory));
+                    displayShoppingHistory(data.shoppingHistory);
+                } else {
+                    document.getElementById('purchase-history-container').innerHTML = '<p>No se pudo cargar el historial de compras.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('purchase-history-container').innerHTML = '<p>Error al cargar el historial de compras.</p>';
+            });
+        }
+
+        function displayShoppingHistory(history) {
+            const container = document.getElementById('purchase-history-container');
+            container.innerHTML = '';
+
+            if (history.length === 0) {
+                container.innerHTML = '<p>No se encontraron compras en el período seleccionado.</p>';
+                return;
+            }
+
+            history.forEach(purchase => {
+                const purchaseElement = document.createElement('div');
+                purchaseElement.className = 'purchase-item';
+                
+                const date = new Date(purchase.fechalista);
+                const formattedDate = date.toLocaleDateString('es-ES', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                let productListHTML = '';
+                if (Array.isArray(purchase.productos)) {
+                    productListHTML = purchase.productos.map(product => `
+                        <div class="product-item">
+                            <img src="${product.imagen}" alt="${product.descripcion}" class="product-image">
+                            <div class="product-details">
+                                <div>${product.descripcion}</div>
+                                <div>Cantidad: ${product.cantidad}</div>
+                                <div>Precio: $${formatPrice(product.precio)}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    console.error('purchase.productos no es un array:', purchase.productos);
+                    productListHTML = '<p>Error: No se pudieron cargar los productos</p>';
+                }
+
+                purchaseElement.innerHTML = `
+                    <div class="purchase-date">${formattedDate}</div>
+                    <div class="product-list">
+                        ${productListHTML}
+                    </div>
+                    <div class="purchase-total">Total: $${formatPrice(purchase.totallista)}</div>
+                `;
+                container.appendChild(purchaseElement);
+            });
+        }
+
+        function formatPrice(price) {
+            return price.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function exportToExcel() {
+            const history = JSON.parse(localStorage.getItem('shoppingHistory'));
+            if (!history || history.length === 0) {
+                alert('No hay datos para exportar.');
+                return;
+            }
+
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(flattenShoppingHistory(history));
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Historial de Compras");
+            XLSX.writeFile(workbook, "historial_de_compras.xlsx");
+        }
+
+        function flattenShoppingHistory(history) {
+            return history.flatMap(purchase => {
+                return purchase.productos.map(product => ({
+                    Fecha: new Date(purchase.fechalista).toLocaleString(),
+                    Producto: product.descripcion,
+                    Cantidad: product.cantidad,
+                    'Precio Unitario': product.precio,
+                    'Precio Total': product.cantidad * product.precio,
+                    'Total de Compra': purchase.totallista
+                }));
+            });
+        }
+
+        function generatePDF() {
+            const history = JSON.parse(localStorage.getItem('shoppingHistory'));
+            if (!history || history.length === 0) {
+                alert('No hay datos para generar el PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text('Historial de Compras', 14, 22);
+
+            let startY = 30;
+            history.forEach((purchase, index) => {
+                doc.setFontSize(14);
+                doc.text(`Compra ${index + 1} - ${new Date(purchase.fechalista).toLocaleString()}`, 14, startY);
+                
+                startY += 10;
+                
+                const tableData = purchase.productos.map(product => [
+                    product.descripcion,
+                    product.cantidad,
+                    `$${formatPrice(product.precio)}`,
+                    `$${formatPrice(product.cantidad * product.precio)}`
+                ]);
+
+                doc.autoTable({
+                    startY: startY,
+                    head: [['Producto', 'Cantidad', 'Precio Unitario', 'Precio Total']],
+                    body: tableData,
+                });
+
+                startY = doc.lastAutoTable.finalY + 10;
+
+                doc.setFontSize(12);
+                doc.text(`Total de la compra: $${formatPrice(purchase.totallista)}`, 14, startY);
+
+                startY += 20;
+
+                if (startY > 270) {
+                    doc.addPage();
+                    startY = 20;
+                }
+            });
+
+            doc.save('historial_de_compras.pdf');
+        }
+    </script>
+</body>
+</html>

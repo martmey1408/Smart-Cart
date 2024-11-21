@@ -1,0 +1,21 @@
+from playwright.sync_api import sync_playwright
+
+def main(link):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # Cambia a True para modo headless
+        page = browser.new_page()
+
+        # Navega a la URL
+        page.goto(link)
+        
+        # Espera a que el contenido esté disponible
+        page.wait_for_load_state('networkidle')
+        categoria_link = page.query_selector(".vtex-breadcrumb-1-x-link.vtex-breadcrumb-1-x-link--breadcrumb-style.vtex-breadcrumb-1-x-link--2.vtex-breadcrumb-1-x-link--breadcrumb-style--2.dib.pv1.link.ph2.c-muted-2.hover-c-link")
+        print(categoria_link.inner_text().strip())  # Imprime el texto de la categoría
+        # Cierra el navegador
+        browser.close()
+
+if __name__ == "__main__":
+    main("https://www.disco.com.ar/papa-lavada-por-kg/p")
+
+

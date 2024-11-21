@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-container a {
+            color: #000;
+            text-decoration: none;
+        }
+        .login-container .forgot-password {
+            text-decoration: underline;
+        }
+        .login-container button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-container .register {
+            margin-top: 10px;
+        }
+        .login-container .register a {
+            text-decoration: underline;
+        }
+        .login-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .login-container .password-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="file:///C:/ingenieria%20Informatica/Cuarto%20a%C3%B1o/Seminario%20de%20Integracion%20Profesional/2do%20cuatrimestre/Sprint%201/imagen/logo.png" alt="logo">
+        <h2><strong><em>Iniciar Sesión</em></strong></h2>
+        <form id="login-form">
+            <label for="username"><strong><em>Ingrese correo electrónico o nombre de usuario:</em></strong></label>
+            <input type="text" id="username" placeholder="Ingrese correo electrónico o nombre de usuario" required>
+            <span id="error-message" style="color: red;"></span>
+            <div class="password-container">
+                <label for="password"><strong><em>Ingrese contraseña:</em></strong></label>
+                <a href="olvide mi contraseña.html" class="forgot-password">Olvidé mi contraseña</a>
+            </div>
+            <input type="password" id="password" placeholder="Ingrese contraseña" required>
+            <button type="submit"><strong><em>Iniciar sesión</em></strong></button>
+            <div class="register">
+                <strong><em>No tienes cuenta? <a href="registro.html">Registrarse</a></em></strong>
+            </div>
+        </form>
+    </div>
+    <script>
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const password = urlParams.get('password');
+            
+            if (username) {
+                document.getElementById('username').value = username;
+            }
+            if (password) {
+                document.getElementById('password').value = password;
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                if (data.userExists) {
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('email', data.mail); 
+                    window.location.href = 'home.html'; 
+                } else {
+                    document.getElementById('error-message').innerText = 'Credenciales no existentes';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
+

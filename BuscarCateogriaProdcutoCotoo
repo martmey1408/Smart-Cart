@@ -1,0 +1,33 @@
+from playwright.sync_api import sync_playwright
+
+def main(link):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # Cambia a True para modo headless
+        page = browser.new_page()
+        # Navega a la URL
+        page.goto(link)
+        # Espera a que el contenido esté disponible
+        page.wait_for_load_state('networkidle')
+        # Selecciona el div que contiene los enlaces
+        breadcrumb_div = page.query_selector("div.row #atg_store_breadcrumbs")
+        if breadcrumb_div:
+            # Encuentra todos los enlaces dentro del div
+            enlaces = breadcrumb_div.query_selector_all("a")
+            # Verifica que haya al menos 4 enlaces
+            if len(enlaces) >= 4:
+             
+                cuarto_enlace = enlaces[3]
+                
+                texto_cuarto_enlace = cuarto_enlace.query_selector("p").inner_text().strip()
+                print(texto_cuarto_enlace) 
+            else:
+                print("No hay suficientes enlaces en el breadcrumb.")
+        else:
+            print("No se encontró el div de breadcrumbs.")
+
+        # Cierra el navegador
+        browser.close()
+
+if __name__ == "__main__":
+    main("https://www.cotodigital3.com.ar/sitios/cdigi/producto/-papa-negra-selec---xkg/_/A-00060947-00060947-200")
+
